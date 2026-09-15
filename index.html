@@ -2,32 +2,126 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WebDEX</title>
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>WebDEX 11</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- Barra superior -->
+  <!-- FUNDO ANIMADO -->
+  <div id="wallpaper"></div>
+  <div id="wallpaper-overlay"></div>
+
+  <!-- TOPBAR (estilo barra de tarefas Win11) -->
   <header id="topbar">
-    <div class="brand">⚡ WebDEX</div>
-    <input id="search" placeholder="Buscar apps..." />
-    <div class="clock" id="clock"></div>
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z" fill="currentColor"/>
+      </svg>
+      <span>WebDEX</span>
+    </div>
+
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+      <input id="search" placeholder="Pesquisar apps..." />
+    </div>
+
+    <div class="topbar-right">
+      <div class="clock-widget" id="clockWidget">
+        <div class="time" id="clock">--:--</div>
+        <div class="date" id="date">--/--</div>
+      </div>
+    </div>
   </header>
 
-  <!-- Área de apps (grid) -->
+  <!-- DESKTOP -->
   <main id="desktop">
     <div id="app-grid"></div>
   </main>
 
-  <!-- Área de janelas (apps abertos) -->
+  <!-- ÁREA DE JANELAS -->
   <div id="windows"></div>
 
-  <!-- Taskbar -->
+  <!-- TASKBAR (dock centralizado estilo Win11) -->
   <footer id="taskbar">
-    <button id="btn-home">🏠</button>
+    <button class="tb-btn" id="btn-home" title="Início">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/>
+      </svg>
+    </button>
+
     <div id="tasks"></div>
+
+    <button class="tb-btn" id="btn-add-app" title="Adicionar app">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+    </button>
+
+    <button class="tb-btn" id="btn-settings" title="Configurações">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
   </footer>
+
+  <!-- MODAL: Adicionar app -->
+  <div id="modal-add" class="modal">
+    <div class="modal-card">
+      <h2>Adicionar novo app</h2>
+      <label>Nome
+        <input id="new-name" placeholder="Ex: Twitter" />
+      </label>
+      <label>URL
+        <input id="new-url" placeholder="https://..." />
+      </label>
+      <label>Ícone (emoji ou URL de imagem)
+        <input id="new-icon" placeholder="🐦 ou https://.../icon.png" />
+      </label>
+      <label class="row">
+        <input type="checkbox" id="new-embed" checked />
+        <span>Tentar embutir (iframe)</span>
+      </label>
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close>Cancelar</button>
+        <button class="btn-primary" id="save-new-app">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Configurações -->
+  <div id="modal-settings" class="modal">
+    <div class="modal-card">
+      <h2>Personalização</h2>
+
+      <label>Cor de destaque
+        <input type="color" id="accent-picker" value="#4cc2ff" />
+      </label>
+
+      <label>Wallpaper — URL (imagem ou vídeo)
+        <input id="wall-url" placeholder="https://.../wallpaper.mp4 ou .jpg" />
+      </label>
+
+      <label>Ou upload do dispositivo
+        <input type="file" id="wall-file" accept="image/*,video/*" />
+      </label>
+
+      <label class="row">
+        <input type="checkbox" id="wall-blur" />
+        <span>Aplicar blur no fundo</span>
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" id="clear-wall">Remover fundo</button>
+        <button class="btn-primary" data-close>Fechar</button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
