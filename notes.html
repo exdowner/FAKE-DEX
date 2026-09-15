@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Notas</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #1a1a1f;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+.sidebar {
+  width: 220px;
+  background: rgba(0,0,0,.25);
+  border-right: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sidebar-head {
+  padding: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.sidebar-head button {
+  flex: 1;
+  padding: 8px;
+  background: #4cc2ff;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+}
+.note-list { flex: 1; overflow-y: auto; }
+.note-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  cursor: pointer;
+  transition: background .15s;
+}
+.note-item:hover { background: rgba(255,255,255,.05); }
+.note-item.active { background: rgba(76,194,255,.12); border-left: 3px solid #4cc2ff; }
+.note-item .title {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.note-item .preview {
+  font-size: 11px;
+  color: rgba(255,255,255,.4);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.editor-head {
+  padding: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.editor-head input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  outline: none;
+  font-family: inherit;
+}
+.editor-head button {
+  padding: 6px 12px;
+  background: rgba(255,255,255,.08);
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+}
+.editor-head button:hover { background: rgba(220,38,38,.5); }
+textarea {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-head">
+    <button id="new-note">+ Nova nota</button>
+  </div>
+  <div class="note-list" id="note-list"></div>
+</div>
+<div class="editor">
+  <div class="editor-head">
+    <input id="title" placeholder="Sem título" />
+    <button id="del">🗑️</button>
+  </div>
+  <textarea id="content" placeholder="Comece a escrever..."></textarea>
+</div>
+
+<script>
+const KEY = 'webdex.notes';
+let notes = JSON.parse(localStorage.getItem(KEY) || '[]');
+let currentId = null;
+
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(notes));
+}
+
+function renderList() {
+  const $list = document.getElementById('note-list');
+  $list.innerHTML = '';
+  notes.slice().sort((a,b) => b.updated - a.updated).forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'note-item' + (n.id === currentId ? ' active' : '');
+    el.innerHTML = `
+      <div class="title">${n.title || 'Sem título'}</div>
+      <div class="preview">${(n.content || '').slice(0, 40) || 'vazio'}</div>
+    `;
+    el.onclick = () => openNote(n.id);
+    $list.appendChild(el);
+  });
+}
+
+function openNote(id) {
+  const n = notes.find(x => x.id === id);
+  if (!n) return;
+  currentId = id;
+  document.getElementById('title').value = n.title;
+  document.getElementById('content').value = n.content;
+  renderList();
+}
+
+document.getElementById('new-note').onclick = () => {
+  const n = { id: Date.now().toString(), title: '', content: '', updated: Date.now() };
+  notes.push(n);
+  save();
+  openNote(n.id);
+  document.getElementById('title').focus();
+};
+
+document.getElementById('title').oninput = e => {
+  const n = notes.find(x => x.id === currentId);
+  if (!n) return;
+  n.title = e.target.value;
+  n.updated = Date.now();
+  save(); renderList();
+};
+
+document.getElementById('content').oninput = e => {
+  const n = notes.find(x => x.id === currentId);
+  if (!n) return;
+  n.content = e.target.value;
+  n.updated = Date.now();
+  save(); renderList();
+};
+
+document.getElementById('del').onclick = () => {
+  if (!currentId) return;
+  if (!confirm('Excluir nota?')) return;
+  notes = notes.filter(n => n.id !== currentId);
+  currentId = null;
+  document.getElementById('title').value = '';
+  document.getElementById('content').value = '';
+  save(); renderList();
+};
+
+if (notes.length === 0) {
+  document.getElementById('new-note').click();
+} else {
+  openNote(notes.slice().sort((a,b) => b.updated - a.updated)[0].id);
+}
+renderList();
+</script>
+</body>
+</html>
