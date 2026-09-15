@@ -1,0 +1,170 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0f0f12;
+  --panel: #1a1a1f;
+  --accent: #6366f1;
+  --text: #e5e5e5;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== TOPBAR ===== */
+#topbar {
+  height: 56px;
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  border-bottom: 1px solid #2a2a30;
+}
+.brand { font-weight: 700; color: var(--accent); }
+#search {
+  flex: 1;
+  max-width: 400px;
+  background: #0a0a0d;
+  border: 1px solid #2a2a30;
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  outline: none;
+}
+#search:focus { border-color: var(--accent); }
+.clock { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* ===== DESKTOP (grid de apps) ===== */
+#desktop {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+#app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.app-icon {
+  background: var(--panel);
+  border: 1px solid #2a2a30;
+  border-radius: 16px;
+  padding: 20px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform .15s, border-color .15s;
+  user-select: none;
+}
+.app-icon:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+.app-icon .emoji { font-size: 40px; display: block; margin-bottom: 8px; }
+.app-icon .name { font-size: 13px; }
+
+/* ===== JANELAS ===== */
+#windows {
+  position: fixed;
+  inset: 56px 0 56px 0;
+  pointer-events: none;
+}
+.window {
+  position: absolute;
+  background: var(--panel);
+  border: 1px solid #2a2a30;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  pointer-events: auto;
+  min-width: 320px;
+  min-height: 240px;
+}
+.window-header {
+  height: 36px;
+  background: #22222a;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  cursor: grab;
+  gap: 8px;
+  font-size: 13px;
+}
+.window-header:active { cursor: grabbing; }
+.window-title { flex: 1; }
+.window-btn {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.window-btn:hover { background: #333; }
+.window-btn.close:hover { background: #dc2626; }
+.window iframe {
+  flex: 1;
+  border: none;
+  background: #fff;
+  width: 100%;
+}
+.window .placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+}
+.window .placeholder button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ===== TASKBAR ===== */
+#taskbar {
+  height: 56px;
+  background: var(--panel);
+  border-top: 1px solid #2a2a30;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+}
+#btn-home {
+  background: #22222a;
+  border: none;
+  color: var(--text);
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+}
+#tasks { display: flex; gap: 8px; flex: 1; overflow-x: auto; }
+.task {
+  background: #22222a;
+  border: 1px solid transparent;
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.task.active { border-color: var(--accent); }
