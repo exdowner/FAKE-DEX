@@ -5,88 +5,177 @@
   <meta name="theme-color" content="#0a0a0f">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>WebDEX 11</title>
+  <title>WebDEX</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- FUNDO ANIMADO -->
-  <div id="wallpaper"></div>
-  <div id="wallpaper-overlay"></div>
-
-  <!-- TOPBAR (estilo barra de tarefas Win11) -->
-  <header id="topbar">
-    <div class="brand">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z" fill="currentColor"/>
-      </svg>
-      <span>WebDEX</span>
-    </div>
-
-    <div class="search-wrap">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-      </svg>
-      <input id="search" placeholder="Pesquisar apps..." />
-    </div>
-
-    <div class="topbar-right">
-      <div class="clock-widget" id="clockWidget">
-        <div class="time" id="clock">--:--</div>
-        <div class="date" id="date">--/--</div>
+  <!-- ================================================== -->
+  <!-- TELA DE LOGIN / REGISTRO                           -->
+  <!-- ================================================== -->
+  <div id="auth-screen">
+    <div class="auth-bg"></div>
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+          <path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z" fill="currentColor"/>
+        </svg>
       </div>
+      <h1 id="auth-title">Entrar no WebDEX</h1>
+      <p id="auth-subtitle">Crie sua conta pra começar</p>
+
+      <!-- Abas -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Login</button>
+        <button class="auth-tab" data-tab="register">Registrar</button>
+      </div>
+
+      <!-- Avatar (só aparece no registro) -->
+      <div class="auth-avatar" id="auth-avatar-wrap" style="display:none">
+        <label for="avatar-input">
+          <div class="avatar-preview" id="avatar-preview">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20a8 8 0 0 1 16 0"/>
+            </svg>
+          </div>
+          <span>Escolher foto</span>
+        </label>
+        <input type="file" id="avatar-input" accept="image/*" hidden />
+      </div>
+
+      <!-- Form login -->
+      <form id="form-login" class="auth-form">
+        <label>Usuário
+          <input id="login-user" placeholder="seu usuario" autocomplete="username" required />
+        </label>
+        <label>Senha
+          <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" required />
+        </label>
+        <div class="auth-error" id="login-error"></div>
+        <button type="submit" class="btn-primary">Entrar</button>
+      </form>
+
+      <!-- Form registro -->
+      <form id="form-register" class="auth-form" style="display:none">
+        <label>Usuário
+          <input id="reg-user" placeholder="escolha um usuario" autocomplete="username" required />
+        </label>
+        <label>Senha
+          <input id="reg-pass" type="password" placeholder="min 4 caracteres" autocomplete="new-password" required />
+        </label>
+        <label>Confirmar senha
+          <input id="reg-pass2" type="password" placeholder="repita a senha" required />
+        </label>
+        <div class="auth-error" id="reg-error"></div>
+        <button type="submit" class="btn-primary">Criar conta</button>
+      </form>
     </div>
-  </header>
+  </div>
 
-  <!-- DESKTOP -->
-  <main id="desktop">
-    <div id="app-grid"></div>
-  </main>
+  <!-- ================================================== -->
+  <!-- APP PRINCIPAL (só aparece logado)                  -->
+  <!-- ================================================== -->
+  <div id="app-shell" style="display:none">
 
-  <!-- ÁREA DE JANELAS -->
-  <div id="windows"></div>
+    <div id="wallpaper"></div>
+    <div id="wallpaper-overlay"></div>
 
-  <!-- TASKBAR (dock centralizado estilo Win11) -->
-  <footer id="taskbar">
-    <button class="tb-btn" id="btn-home" title="Início">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/>
-      </svg>
-    </button>
+    <header id="topbar">
+      <div class="brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z" fill="currentColor"/>
+        </svg>
+        <span>WebDEX</span>
+      </div>
 
-    <div id="tasks"></div>
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input id="search" placeholder="Pesquisar apps..." />
+      </div>
 
-    <button class="tb-btn" id="btn-add-app" title="Adicionar app">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
-    </button>
+      <div class="topbar-right">
+        <div class="clock-widget" id="clockWidget">
+          <div class="time" id="clock">--:--</div>
+          <div class="date" id="date">--/--</div>
+        </div>
 
-    <button class="tb-btn" id="btn-settings" title="Configurações">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
-    </button>
-  </footer>
+        <!-- Perfil -->
+        <button class="user-btn" id="btn-user" title="Perfil">
+          <img id="user-avatar-top" src="" alt="" />
+        </button>
+      </div>
+    </header>
 
-  <!-- MODAL: Adicionar app -->
+    <main id="desktop">
+      <div id="app-grid"></div>
+    </main>
+
+    <div id="windows"></div>
+
+    <footer id="taskbar">
+      <button class="tb-btn" id="btn-home" title="Início">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/>
+        </svg>
+      </button>
+
+      <div id="tasks"></div>
+
+      <button class="tb-btn" id="btn-add-app" title="Adicionar app">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+
+      <button class="tb-btn" id="btn-settings" title="Personalizar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </footer>
+  </div>
+
+  <!-- ================================================== -->
+  <!-- MODAL: Adicionar app                               -->
+  <!-- ================================================== -->
   <div id="modal-add" class="modal">
     <div class="modal-card">
-      <h2>Adicionar novo app</h2>
-      <label>Nome
-        <input id="new-name" placeholder="Ex: Twitter" />
+      <h2>Adicionar app</h2>
+
+      <label>Nome do app
+        <input id="new-name" placeholder="Ex: Free Fire" />
       </label>
-      <label>URL
+
+      <label>Link / URL
         <input id="new-url" placeholder="https://..." />
       </label>
-      <label>Ícone (emoji ou URL de imagem)
-        <input id="new-icon" placeholder="🐦 ou https://.../icon.png" />
+
+      <label>Ícone
+        <div class="icon-picker">
+          <div class="icon-preview" id="icon-preview">🌐</div>
+          <input id="new-icon" placeholder="Emoji ou URL" />
+          <label class="upload-mini" for="icon-file">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+          </label>
+          <input type="file" id="icon-file" accept="image/*" hidden />
+        </div>
       </label>
+
       <label class="row">
         <input type="checkbox" id="new-embed" checked />
-        <span>Tentar embutir (iframe)</span>
+        <span>Tentar abrir dentro do WebDEX (iframe)</span>
       </label>
+
+      <label class="row">
+        <input type="checkbox" id="new-fullscreen" checked />
+        <span>Abrir em tela cheia por padrão</span>
+      </label>
+
       <div class="modal-actions">
         <button class="btn-ghost" data-close>Cancelar</button>
         <button class="btn-primary" id="save-new-app">Adicionar</button>
@@ -94,30 +183,129 @@
     </div>
   </div>
 
-  <!-- MODAL: Configurações -->
-  <div id="modal-settings" class="modal">
+  <!-- ================================================== -->
+  <!-- MODAL: Perfil                                      -->
+  <!-- ================================================== -->
+  <div id="modal-user" class="modal">
     <div class="modal-card">
-      <h2>Personalização</h2>
-
-      <label>Cor de destaque
-        <input type="color" id="accent-picker" value="#4cc2ff" />
-      </label>
-
-      <label>Wallpaper — URL (imagem ou vídeo)
-        <input id="wall-url" placeholder="https://.../wallpaper.mp4 ou .jpg" />
-      </label>
-
-      <label>Ou upload do dispositivo
-        <input type="file" id="wall-file" accept="image/*,video/*" />
-      </label>
-
-      <label class="row">
-        <input type="checkbox" id="wall-blur" />
-        <span>Aplicar blur no fundo</span>
-      </label>
+      <h2>Meu perfil</h2>
+      <div class="profile-head">
+        <div class="avatar-preview large">
+          <img id="user-avatar-modal" src="" alt="" />
+        </div>
+        <div>
+          <div class="profile-name" id="user-name-modal">usuario</div>
+          <label class="upload-link" for="avatar-change">
+            Trocar foto
+            <input type="file" id="avatar-change" accept="image/*" hidden />
+          </label>
+        </div>
+      </div>
 
       <div class="modal-actions">
-        <button class="btn-ghost" id="clear-wall">Remover fundo</button>
+        <button class="btn-ghost" id="btn-logout">Sair da conta</button>
+        <button class="btn-primary" data-close>Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================== -->
+  <!-- MODAL: Personalização (painel completo)            -->
+  <!-- ================================================== -->
+  <div id="modal-settings" class="modal">
+    <div class="modal-card large">
+      <h2>Personalização</h2>
+
+      <div class="settings-grid">
+
+        <!-- Aparência -->
+        <section class="settings-section">
+          <h3>Aparência</h3>
+
+          <label>Cor de destaque
+            <input type="color" id="cfg-accent" value="#4cc2ff" />
+          </label>
+
+          <label>Tamanho dos ícones: <b id="cfg-icon-size-val">48</b>px
+            <input type="range" id="cfg-icon-size" min="32" max="96" value="48" />
+          </label>
+
+          <label>Tamanho das fontes: <b id="cfg-font-size-val">13</b>px
+            <input type="range" id="cfg-font-size" min="11" max="20" value="13" />
+          </label>
+
+          <label>Fonte
+            <select id="cfg-font">
+              <option value='"Segoe UI Variable","Segoe UI",system-ui,sans-serif'>Segoe UI (padrão Win11)</option>
+              <option value='"Inter",sans-serif'>Inter</option>
+              <option value='"Poppins",sans-serif'>Poppins</option>
+              <option value='"Roboto",sans-serif'>Roboto</option>
+              <option value='"JetBrains Mono",monospace'>JetBrains Mono</option>
+              <option value='"Cascadia Code",monospace'>Cascadia Code</option>
+              <option value='Georgia,serif'>Georgia</option>
+            </select>
+          </label>
+
+          <label>Espaçamento da grade: <b id="cfg-gap-val">8</b>px
+            <input type="range" id="cfg-gap" min="0" max="32" value="8" />
+          </label>
+        </section>
+
+        <!-- Transparência -->
+        <section class="settings-section">
+          <h3>Transparência</h3>
+
+          <label>Opacidade dos menus: <b id="cfg-opacity-val">55</b>%
+            <input type="range" id="cfg-opacity" min="20" max="100" value="55" />
+          </label>
+
+          <label>Intensidade do blur: <b id="cfg-blur-val">30</b>px
+            <input type="range" id="cfg-blur" min="0" max="60" value="30" />
+          </label>
+
+          <label>Cantos arredondados: <b id="cfg-radius-val">8</b>px
+            <input type="range" id="cfg-radius" min="0" max="24" value="8" />
+          </label>
+        </section>
+
+        <!-- Wallpaper -->
+        <section class="settings-section">
+          <h3>Plano de fundo</h3>
+
+          <label>URL (imagem ou vídeo)
+            <input id="wall-url" placeholder="https://.../wall.mp4" />
+          </label>
+
+          <label>Upload do dispositivo
+            <input type="file" id="wall-file" accept="image/*,video/*" />
+          </label>
+
+          <label class="row">
+            <input type="checkbox" id="wall-blur" />
+            <span>Aplicar blur no fundo</span>
+          </label>
+
+          <button class="btn-ghost small" id="clear-wall">Remover fundo</button>
+        </section>
+
+        <!-- Animações -->
+        <section class="settings-section">
+          <h3>Animações</h3>
+
+          <label class="row">
+            <input type="checkbox" id="cfg-anim" checked />
+            <span>Ativar animações</span>
+          </label>
+
+          <label>Velocidade: <b id="cfg-anim-speed-val">1</b>x
+            <input type="range" id="cfg-anim-speed" min="0.5" max="2" step="0.1" value="1" />
+          </label>
+        </section>
+
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" id="btn-reset-settings">Resetar tudo</button>
         <button class="btn-primary" data-close>Fechar</button>
       </div>
     </div>
