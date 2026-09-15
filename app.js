@@ -583,4 +583,288 @@ document.getElementById('save-new-app').onclick = () => {
 
   if (!name || !url) return alert('Preencha nome e URL');
 
-  addApp({ name, url, icon, embed, fu
+    addApp({ name, url, icon, embed, fullscreen, id: 'app-' + Date.now() });
+
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-url').value = '';
+  document.getElementById('new-icon').value = '';
+  document.getElementById('icon-preview').innerHTML = '🌐';
+  document.getElementById('modal-add').classList.remove('open');
+};
+
+// ============================================================
+// MODAL PERFIL
+// ============================================================
+const $modalUser = document.getElementById('modal-user');
+document.getElementById('btn-user').onclick = () => $modalUser.classList.add('open');
+$modalUser.querySelectorAll('[data-close]').forEach(b =>
+  b.onclick = () => $modalUser.classList.remove('open')
+);
+$modalUser.addEventListener('click', e => {
+  if (e.target === $modalUser) $modalUser.classList.remove('open');
+});
+
+// ============================================================
+// MODAL PERSONALIZAÇÃO
+// ============================================================
+const $modalSet = document.getElementById('modal-settings');
+document.getElementById('btn-settings').onclick = () => $modalSet.classList.add('open');
+$modalSet.querySelectorAll('[data-close]').forEach(b =>
+  b.onclick = () => $modalSet.classList.remove('open')
+);
+$modalSet.addEventListener('click', e => {
+  if (e.target === $modalSet) $modalSet.classList.remove('open');
+});
+
+// ============================================================
+// PREFS (personalização)
+// ============================================================
+function prefsKey() { return getUserDataKey(state.user, LS.PREFS); }
+
+function savePrefs() {
+  localStorage.setItem(prefsKey(), JSON.stringify(state.prefs));
+}
+
+function applyPrefs() {
+  const p = state.prefs;
+  const root = document.documentElement;
+  root.style.setProperty('--accent', p.accent);
+  root.style.setProperty('--icon-size', p.iconSize + 'px');
+  root.style.setProperty('--icon-font', Math.round(p.iconSize * 0.66) + 'px');
+  root.style.setProperty('--font-size', p.fontSize + 'px');
+  root.style.setProperty('--font-family', p.fontFamily);
+  root.style.setProperty('--grid-gap', p.gap + 'px');
+  root.style.setProperty('--menu-opacity', (p.opacity / 100).toString());
+  root.style.setProperty('--blur-amt', p.blur + 'px');
+  root.style.setProperty('--radius', p.radius + 'px');
+  root.style.setProperty('--radius-lg', (p.radius * 1.5) + 'px');
+  root.style.setProperty('--anim-speed', p.animations ? p.animSpeed : '0.001');
+}
+
+function restorePrefs() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(prefsKey()) || 'null');
+    if (saved) state.prefs = { ...state.prefs, ...saved };
+  } catch {}
+  applyPrefs();
+  syncPrefsUI();
+}
+
+function syncPrefsUI() {
+  const p = state.prefs;
+  document.getElementById('cfg-accent').value = p.accent;
+  document.getElementById('cfg-icon-size').value = p.iconSize;
+  document.getElementById('cfg-icon-size-val').textContent = p.iconSize;
+  document.getElementById('cfg-font-size').value = p.fontSize;
+  document.getElementById('cfg-font-size-val').textContent = p.fontSize;
+  document.getElementById('cfg-font').value = p.fontFamily;
+  document.getElementById('cfg-gap').value = p.gap;
+  document.getElementById('cfg-gap-val').textContent = p.gap;
+  document.getElementById('cfg-opacity').value = p.opacity;
+  document.getElementById('cfg-opacity-val').textContent = p.opacity;
+  document.getElementById('cfg-blur').value = p.blur;
+  document.getElementById('cfg-blur-val').textContent = p.blur;
+  document.getElementById('cfg-radius').value = p.radius;
+  document.getElementById('cfg-radius-val').textContent = p.radius;
+  document.getElementById('cfg-anim').checked = p.animations;
+  document.getElementById('cfg-anim-speed').value = p.animSpeed;
+  document.getElementById('cfg-anim-speed-val').textContent = p.animSpeed;
+}
+
+function bindPref(id, key, isRange = false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const handler = () => {
+    state.prefs[key] = isRange ? parseFloat(el.value) : el.value;
+    const valEl = document.getElementById(id + '-val');
+    if (valEl) valEl.textContent = el.value;
+    savePrefs();
+    applyPrefs();
+  };
+  el.addEventListener('input', handler);
+  el.addEventListener('change', handler);
+}
+
+bindPref('cfg-accent', 'accent');
+bindPref('cfg-icon-size', 'iconSize', true);
+bindPref('cfg-font-size', 'fontSize', true);
+bindPref('cfg-font', 'fontFamily');
+bindPref('cfg-gap', 'gap', true);
+bindPref('cfg-opacity', 'opacity', true);
+bindPref('cfg-blur', 'blur', true);
+bindPref('cfg-radius', 'radius', true);
+bindPref('cfg-anim-speed', 'animSpeed', true);
+
+const $animToggle = document.getElementById('cfg-anim');
+if ($animToggle) {
+  $animToggle.onchange = (e) => {
+    state.prefs.animations = e.target.checked;
+    savePrefs();
+    applyPrefs();
+  };
+}
+
+const $resetBtn = document.getElementById('btn-reset-settings');
+if ($resetBtn) {
+  $resetBtn.onclick = () => {
+    if (!confirm('Resetar todas as personalizações?')) return;
+    localStorage.removeItem(prefsKey());
+    location.reload();
+  };
+}
+
+// ============================================================
+// WALLPAPER
+// ============================================================
+function setWallpaper(cfg) {
+  const $wall = document.getElementById('wallpaper');
+  $wall.innerHTML = '';
+  $wall.style.background = '';
+
+  if (cfg.type === 'url' && /\.(mp4|webm|ogg)(\?|$)/i.test(cfg.value)) {
+    const v = document.createElement('video');
+    v.src = cfg.value;
+    v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+    $wall.appendChild(v);
+  } else if (cfg.isVideo) {
+    const v = document.createElement('video');
+    v.src = cfg.value;
+    v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+    $wall.appendChild(v);
+  } else {
+    $wall.style.backgroundImage = `url("${cfg.value}")`;
+  }
+
+  localStorage.setItem(getUserDataKey(state.user, LS.WALL), JSON.stringify(cfg));
+}
+
+function getWallConfig() {
+  try {
+    return JSON.parse(localStorage.getItem(getUserDataKey(state.user, LS.WALL)) || 'null');
+  } catch { return null; }
+}
+
+function restoreWallpaper() {
+  const cfg = getWallConfig();
+  if (cfg) {
+    setWallpaper(cfg);
+    const blurToggle = document.getElementById('wall-blur');
+    if (cfg.blur && blurToggle) blurToggle.checked = true;
+  }
+}
+
+const $wallUrl = document.getElementById('wall-url');
+if ($wallUrl) {
+  $wallUrl.onchange = (e) => {
+    const url = e.target.value.trim();
+    if (!url) return;
+    setWallpaper({ type: 'url', value: url });
+  };
+}
+
+const $wallFile = document.getElementById('wall-file');
+if ($wallFile) {
+  $wallFile.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setWallpaper({
+      type: 'data', value: reader.result, isVideo: file.type.startsWith('video')
+    });
+    reader.readAsDataURL(file);
+  };
+}
+
+const $wallBlur = document.getElementById('wall-blur');
+if ($wallBlur) {
+  $wallBlur.onchange = (e) => {
+    const $wall = document.getElementById('wallpaper');
+    $wall.classList.toggle('blur', e.target.checked);
+    const w = getWallConfig();
+    if (w) {
+      w.blur = e.target.checked;
+      localStorage.setItem(getUserDataKey(state.user, LS.WALL), JSON.stringify(w));
+    }
+  };
+}
+
+const $clearWall = document.getElementById('clear-wall');
+if ($clearWall) {
+  $clearWall.onclick = () => {
+    const $wall = document.getElementById('wallpaper');
+    $wall.innerHTML = '';
+    $wall.style.background = '';
+    localStorage.removeItem(getUserDataKey(state.user, LS.WALL));
+    if ($wallUrl) $wallUrl.value = '';
+  };
+}
+
+// ============================================================
+// HOME BUTTON
+// ============================================================
+document.getElementById('btn-home').onclick = () => {
+  state.windows.forEach(w => {
+    w.minimized = true;
+    const el = document.getElementById(`win-${w.id}`);
+    if (el) el.style.display = 'none';
+  });
+  renderTasks();
+};
+
+// ============================================================
+// ANDROID BACK
+// ============================================================
+window.addEventListener('popstate', () => {
+  const anyModal = document.querySelector('.modal.open');
+  if (anyModal) {
+    anyModal.classList.remove('open');
+    history.pushState(null, '', location.href);
+    return;
+  }
+  const lastWin = state.windows[state.windows.length - 1];
+  if (lastWin) {
+    closeWindow(lastWin.id);
+    history.pushState(null, '', location.href);
+  }
+});
+history.pushState(null, '', location.href);
+
+document.addEventListener('gesturestart', e => e.preventDefault());
+
+// ============================================================
+// INIT — checa sessão
+// ============================================================
+(async function boot() {
+  // Bind das abas de login/registro
+  function bindAuthTabs() {
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const isLogin = tab.dataset.tab === 'login';
+        document.getElementById('form-login').style.display = isLogin ? 'block' : 'none';
+        document.getElementById('form-register').style.display = isLogin ? 'none' : 'block';
+        document.getElementById('auth-avatar-wrap').style.display = isLogin ? 'none' : 'flex';
+        document.getElementById('auth-title').textContent = isLogin ? 'Entrar no WebDEX' : 'Criar conta';
+        document.getElementById('auth-subtitle').textContent = isLogin ? 'Bem-vindo de volta' : 'Escolha sua foto de perfil';
+      };
+    });
+  }
+  bindAuthTabs();
+
+  const sess = localStorage.getItem(LS.SESSION);
+  if (sess) {
+    try {
+      const { username, hash } = JSON.parse(sess);
+      const user = getUsers().find(u => u.name === username && u.pass === hash);
+      if (user) {
+        state.user = username;
+        await enterApp();
+        return;
+      }
+    } catch {}
+    localStorage.removeItem(LS.SESSION);
+  }
+  // Mostra login
+  $authScreen.style.display = 'flex';
+})();
