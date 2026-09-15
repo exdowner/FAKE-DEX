@@ -1,34 +1,6 @@
 [
-  {
-    "id": "youtube",
-    "name": "YouTube",
-    "icon": "▶️",
-    "url": "https://youtube.com",
-    "color": "#ff0000",
-    "embed": false
-  },
-  {
-    "id": "gpt",
-    "name": "ChatGPT",
-    "icon": "🤖",
-    "url": "https://chat.openai.com",
-    "color": "#10a37f",
-    "embed": false
-  },
-  {
-    "id": "notes",
-    "name": "Notas",
-    "icon": "📝",
-    "url": "notes.html",
-    "color": "#f59e0b",
-    "embed": true
-  },
-  {
-    "id": "calc",
-    "name": "Calculadora",
-    "icon": "🧮",
-    "url": "calc.html",
-    "color": "#3b82f6",
-    "embed": true
-  }
+  { "id": "calc", "name": "Calculadora", "icon": "🧮", "url": "apps/calc.html", "embed": true },
+  { "id": "notes", "name": "Notas", "icon": "📝", "url": "apps/notes.html", "embed": true },
+  { "id": "terminal", "name": "Terminal", "icon": "💻", "url": "apps/terminal.html", "embed": true },
+  { "id": "settings", "name": "Config", "icon": "⚙️", "url": "apps/settings.html", "embed": true }
 ]
